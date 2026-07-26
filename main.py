@@ -106,7 +106,7 @@ def register(user: UserRegister):
     }).execute()
     return {"message": "User registered successfully"}
 
-LOGIN and get a JWT token
+# LOGIN and get a JWT token
 @app.post("/login", response_model=Token)
 def login(user: UserLogin):
     result = supabase.table("users").select("*").eq("email", user.email).execute()
