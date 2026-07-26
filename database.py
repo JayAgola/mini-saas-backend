@@ -8,8 +8,8 @@ URL = os.getenv("SUPABASE_URL")
 # URL=URL.strip('"').strip("'")
 KEY = os.getenv("SUPABASE_KEY")
 # KEY = KEY.strip('"').strip("'")
-print(URL)
-print(KEY)
+# print(URL)
+# print(KEY)
 
 supabase = create_client(
     URL,
