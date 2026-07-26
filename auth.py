@@ -11,6 +11,8 @@ load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
+SECRET_KEY = SECRET_KEY.strip('"').strip("'")
+ALGORITHM = ALGORITHM.strip('"').strip("'")
 EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

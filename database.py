@@ -4,7 +4,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+URL = os.getenv("SUPABASE_URL")
+URL=URL.strip('"').strip("'")
+KEY = os.getenv("SUPABASE_KEY")
+KEY = KEY.strip('"').strip("'")
+
+
 supabase = create_client(
-    os.getenv("SUPABASE_URL"),
-    os.getenv("SUPABASE_KEY")
+    URL,
+    KEY
 )
