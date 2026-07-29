@@ -22,3 +22,16 @@
 2. pip install -r requirements.txt
 3. Add .env with your Supabase + secret keys
 4. uvicorn main:app --reload
+
+
+## Run with Docker
+
+# Pull from Docker Hub
+docker pull yourusername/mini-saas-api:v1
+
+# Run (add your own environment variables)
+docker run -p 8000:8000 --env-file .env.docker yourusername/mini-saas-api:v1
+
+# Or build locally
+docker build -t mini-saas-api .
+docker run -p 8000:8000 --env-file .env.docker mini-saas-api
