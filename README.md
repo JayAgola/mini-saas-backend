@@ -27,10 +27,10 @@
 ## Run with Docker
 
 # Pull from Docker Hub
-docker pull yourusername/mini-saas-api:v1
+docker pull aj660/mini-saas-api:v1
 
 # Run (add your own environment variables)
-docker run -p 8000:8000 --env-file .env.docker yourusername/mini-saas-api:v1
+docker run -p 8000:8000 --env-file .env.docker aj660/mini-saas-api:v1
 
 # Or build locally
 docker build -t mini-saas-api .
