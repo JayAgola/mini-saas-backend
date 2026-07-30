@@ -9,7 +9,18 @@ from pydantic import BaseModel
 from typing import List
 import shutil
 from mutagen.mp3 import MP3
+from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI(title="Mini SaaS API", version="1.0")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://approval-dashboard-psi.vercel.app",
+        "http://localhost:3000"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 class VideoRenderRequest(BaseModel):
     title: str
     subtitle: str
@@ -90,37 +101,43 @@ def trigger_render(req: VideoRenderRequest):
 def root():
     return {"message": "Mini SaaS API is running"}
 
-# # REGISTER a new user
-# @app.post("/register")
-# def register(user: UserRegister):
-#     # Check if email already exists
-#     existing = supabase.table("users").select("*").eq("email", user.email).execute()
-#     if existing.data:
-#         raise HTTPException(status_code=400, detail="Email already registered")
+# REGISTER a new user
+@app.post("/register")
+def register(user: UserRegister):
+    # Check if email already exists
+    existing = supabase.table("users").select("*").eq("email", user.email).execute()
+    if existing.data:
+        raise HTTPException(status_code=400, detail="Email already registered")
 
-#     # Hash password and save to Supabase
-#     hashed = hash_password(user.password)
-#     supabase.table("users").insert({
-#         "email": user.email,
-#         "hashed_password": hashed
-#     }).execute()
-#     return {"message": "User registered successfully"}
+    # Hash password and save to Supabase
+    hashed = hash_password(user.password)
+    supabase.table("users").insert({
+        "email": user.email,
+        "hashed_password": hashed
+    }).execute()
+    return {"message": "User registered successfully"}
 
-# # LOGIN and get a JWT token
-# @app.post("/login", response_model=Token)
-# def login(user: UserLogin):
-#     result = supabase.table("users").select("*").eq("email", user.email).execute()
-#     if not result.data:
-#         raise HTTPException(status_code=401, detail="Invalid email or password")
+# LOGIN and get a JWT token
+@app.post("/login", response_model=Token)
+def login(user: UserLogin):
+    result = supabase.table("users").select("*").eq("email", user.email).execute()
+    if not result.data:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
 
-#     db_user = result.data[0]
-#     if not verify_password(user.password, db_user["hashed_password"]):
-#         raise HTTPException(status_code=401, detail="Invalid email or password")
+    db_user = result.data[0]
+    if not verify_password(user.password, db_user["hashed_password"]):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
 
-#     token = create_token({"sub": user.email})
-#     return {"access_token": token, "token_type": "bearer"}
+    token = create_token({"sub": user.email})
+    return {"access_token": token, "token_type": "bearer"}
 
-# # PROTECTED route — only works with a valid token
-# @app.get("/me")
-# def get_profile(current_user: str = Depends(get_current_user)):
-#     return {"email": current_user, "message": "You are authenticated!"}
+# PROTECTED route — only works with a valid token
+@app.get("/me")
+def get_profile(current_user: str = Depends(get_current_user)):
+    return {"email": current_user, "message": "You are authenticated!"}
+
+@app.post("/logout")
+def logout(current_user: str = Depends(get_current_user)):
+    return {
+        "message": f"{current_user} logged out successfully"
+    }
