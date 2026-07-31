@@ -10,6 +10,12 @@ from auth import hash_password, verify_password, create_token, get_current_user
 # import shutil
 # from mutagen.mp3 import MP3
 from fastapi.middleware.cors import CORSMiddleware
+
+from youtube_uploader import upload_video
+from pydantic import BaseModel
+from typing import List, Optional
+
+
 app = FastAPI(title="Mini SaaS API", version="1.0")
 app.add_middleware(
     CORSMiddleware,
@@ -18,6 +24,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class UploadRequest(BaseModel):
+    video_path: str
+    title: str
+    description: str
+    tags: Optional[List[str]] = None
+    privacy: str = "unlisted"
+
 # class VideoRenderRequest(BaseModel):
 #     title: str
 #     subtitle: str
@@ -138,3 +152,28 @@ def logout(current_user: str = Depends(get_current_user)):
     return {
         "message": f"{current_user} logged out successfully"
     }
+
+
+@app.post("/upload")
+def upload_to_youtube(
+    req: UploadRequest,
+    current_user: str = Depends(get_current_user)  # requires JWT auth
+):
+    """Upload a rendered video to YouTube. Requires authentication."""
+    try:
+        result = upload_video(
+            video_path=req.video_path,
+            title=req.title,
+            description=req.description,
+            tags=req.tags,
+            privacy=req.privacy
+        )
+        return {
+            "status": "success",
+            "uploaded_by": current_user,
+            **result
+        }
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
