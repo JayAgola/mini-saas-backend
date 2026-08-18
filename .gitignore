@@ -1,6 +1,7 @@
 .env
 .env.docker
 *.log
+*.json
 __pycache__/
 venv/
 client_secrets.json
